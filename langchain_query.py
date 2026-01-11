@@ -1,9 +1,9 @@
 import sys
 import traceback
 
-from langchain_community.embeddings import HuggingFaceEmbeddings
+# from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_huggingface import HuggingFaceEmbeddings
-# from langchain_community.vectorstores import FAISS
+from langchain_community.vectorstores import FAISS
 from langchain.chains import LLMChain
 from langchain_community.llms import Ollama
 from langchain.prompts import PromptTemplate
@@ -48,8 +48,8 @@ try:
     print("Context length:", len(context), file=sys.stderr)
 
     # local LLM served by Ollama
-    # llm = Ollama(model="llama3.2:3b", base_url="http://localhost:11434")
-    llm = Ollama(model="llama3:instruct", base_url="http://localhost:11434")
+    # llm = Ollama(model="llama3.1:70b", base_url="http://localhost:11434")
+    llm = Ollama(model="llama-tutor:latest", base_url="http://localhost:11434")
     print("LLM loaded", file=sys.stderr)
 
     # prompt: quiz mode expects Q/A style; chat mode answers based on retrieved context only
@@ -80,24 +80,33 @@ Reply:
         prompt_template = PromptTemplate(
             input_variables=["history", "context", "question"],
             template="""
-You are a helpful tutor. You are answering based on the following course material:
+    You are a tutor. Use the context to ask ONE short quiz question OR grade the student's last answer.
 
-{context}
+    Rules:
+    - Output must be SHORT (max 2-3 sentences).
+    - Do NOT include "Current conversation", "Evaluation", or any meta commentary.
+    - Do NOT repeat the full history.
+    - If asking a quiz question, use EXACTLY this format:
 
-Respond clearly and naturally to the student's question using only the information above.
-If the question is broad (e.g. "What is the document about?"), provide a concise summary based on the beginning or title of the document.
-Avoid copying exact text. Rephrase naturally like a human would.
+    Question: <one question>
+    Answer: <one short correct answer>
 
-If the answer cannot be found, say: "I'm not sure based on the document."
+    If grading an answer, reply with:
+    Correct. <1 short explanation>
+    OR
+    Not quite. <correct answer + 1 short explanation>
 
-Conversation history:
-{history}
+    Context:
+    {context}
 
-Student asks:
-{question}
+    History (for you only, do not repeat):
+    {history}
 
-Your response:
-"""
+    Student message:
+    {question}
+
+    Output:
+    """
         )
 
     # run the chain with history + retrieved context + user message
@@ -121,8 +130,8 @@ except Exception as e:
     print("Vector load failed. Falling back to direct model response.", file=sys.stderr)
     traceback.print_exc()
     try:
-        # llm = Ollama(model="llama3.2:3b")
-        llm = Ollama(model="llama3:instruct")
+        # llm = Ollama(model="llama3.1:70b")
+        llm = Ollama(model="llama-tutor:latest")
         response = llm.invoke(message)
         print(response.strip())
     except Exception:
