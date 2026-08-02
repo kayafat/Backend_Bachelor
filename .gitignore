@@ -115,3 +115,10 @@ typings/
 *.pid
 *.seed
 *.pid.lock
+
+
+# ------------------------------
+# Evaluation
+# ------------------------------
+/evaluation/
+/run_gesture_eval.py

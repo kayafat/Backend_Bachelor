@@ -31,10 +31,30 @@ let pdfContext = "";
 
 // TTS output location (served statically)
 //const audioDir = "C:/Users/mehme/Documents/Unreal Projects/Bachelor/generated";   //anpassen
-const audioDir = "C:/Users/Rabia/OneDrive/Dokumente/Esslingen/Bachelorarbeit/Backend/Backend_Bachelor/generated";
+const audioDir = "D:/Bachelorarbeit/Backend_Bachelor/generated";
 const audioFilename = "reply.wav";
 const audioFullPath = `${audioDir}/${audioFilename}`;
 app.use("/audio", express.static(audioDir));
+
+//Hilfsfunktion für den Piper Server!
+
+async function synthesizeWithPiperServer(text, outputPath) {
+  const response = await fetch("http://127.0.0.1:5005/tts", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      text,
+      output_path: outputPath
+    })
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error("Piper server failed: " + errorText);
+  }
+
+  return await response.json();
+}
 
 // upload one PDF for a course → build FAISS index via python
 app.post("/api/upload-pdf", upload.single("file"), async (req, res) => {
@@ -98,7 +118,7 @@ app.post("/api/semantic-chat", async (req, res) => {
       return res.json({
         transcript: message,
         response: reply,
-        audio_url: `http://localhost:3003/audio/${audioFilename}`
+        audio_url: `http://localhost:3003/audio/${audioFilename}?t=${Date.now()}`
       });
     }
 
@@ -203,11 +223,28 @@ app.post("/api/semantic-chat", async (req, res) => {
 
     const questionOnly = reply.match(/Question:\s*(.+?)(?:\r?\n|$)/i)?.[1]?.trim() || reply;
 
+    let gestureData = {
+      gesture: "idle",
+      emotion: "neutral",
+      intensity: "low"
+    };
+
+    try {
+      if (!gestureResult.error && gestureResult.status === 0) {
+        gestureData = JSON.parse(gestureResult.stdout.trim());
+      }
+    } catch (e) {
+      console.error("Gesture JSON parse failed:", e);
+    }
+
     // package response for the client
     const finalPayload = {
       transcript: message,
       response: reply,
-      audio_url: `http://localhost:3003/audio/${audioFilename}`
+      audio_url: `http://localhost:3003/audio/${audioFilename}?t=${Date.now()}`,
+      gesture: gestureData.gesture,
+      emotion: gestureData.emotion,
+      intensity: gestureData.intensity
     };
 
     res.json(finalPayload);
@@ -287,7 +324,7 @@ app.post("/api/record-and-process", async (req, res) => {
     fs.writeFileSync("history.txt", historyText);
 
     //const audioDir = "C:/Users/mehme/Documents/Unreal Projects/Bachelor/generated";
-    const audioDir = "C:/Users/Rabia/OneDrive/Dokumente/Esslingen/Bachelorarbeit/Backend/Backend_Bachelor/generated";
+    const audioDir = "D:/Bachelorarbeit/Backend_Bachelor/generated";
     const audioFilename = "reply.wav";
     const audioFullPath = `${audioDir}/${audioFilename}`;
 
@@ -301,7 +338,7 @@ app.post("/api/record-and-process", async (req, res) => {
     console.log("🎙️ Recording completed");
 
     //const audioPath = "C:/Users/mehme/Documents/Unreal Projects/Bachelor/Test/voice.wav";
-    const audioPath = "C:/Users/Rabia/OneDrive/Dokumente/Esslingen/Bachelorarbeit/Unreal Project/Unreal_Engine_Bachelor/Test/voice.wav";
+    const audioPath = "D:/Bachelorarbeit/Neu/Unreal_Engine_Bachelor/Test/voice.wav";
 
     // 2) transcribe with Whisper
     const whisper = spawnSync("py", ["-3.10", "whisper_stt.py", audioPath], { encoding: "utf-8" });
@@ -326,7 +363,7 @@ app.post("/api/record-and-process", async (req, res) => {
       return res.end(JSON.stringify({
         transcript,
         response: reply,
-        audio_url: `http://localhost:3003/audio/${audioFilename}`
+        audio_url: `http://localhost:3003/audio/${audioFilename}?t=${Date.now()}`,
       }));
     }
 
@@ -350,7 +387,7 @@ app.post("/api/record-and-process", async (req, res) => {
       return res.end(JSON.stringify({
         transcript,
         response: feedback,
-        audio_url: `http://localhost:3003/audio/${audioFilename}`
+        audio_url: `http://localhost:3003/audio/${audioFilename}?t=${Date.now()}`
       }));
     }
 
@@ -385,30 +422,128 @@ app.post("/api/record-and-process", async (req, res) => {
     aiReply = cleanLines.join("\n").trim();
     console.log("🤖 AI Response:", aiReply);
 
+    let aiGestureList = [
+      { gesture: "talk_pose", emotion: "neutral", intensity: "low" }
+    ];
+
+    try {
+      const parsed = JSON.parse(aiReply);
+
+      aiReply = parsed.response || aiReply;
+      aiGestureList = (parsed.gestures || ["talk_pose"]).map(g => {
+        if (typeof g === "string") {
+          return { gesture: g, emotion: "neutral", intensity: "low" };
+        }
+        return g;
+      });
+
+      console.log("✅ Parsed AI response:", aiReply);
+      console.log("✅ Parsed gestures:", aiGestureList);
+    } catch (e) {
+      console.error("❌ AI JSON parse failed:", e.message);
+    }
+
     // store messages
     await saveMessage(conversationId, "user", transcript);
     await saveMessage(conversationId, "ai", aiReply);
 
     // synthesize audio for the reply (sanitized)
     fs.mkdirSync(audioDir, { recursive: true });
-    const safeReply = aiReply
+
+    function clearGeneratedAudio() {
+      if (!fs.existsSync(audioDir)) return;
+
+      for (const file of fs.readdirSync(audioDir)) {
+        if (file.startsWith("reply_") && file.endsWith(".wav")) {
+          fs.unlinkSync(path.join(audioDir, file));
+        }
+      }
+    }
+
+    let cleanReplyForTTS = aiReply
+      .replace(/\([^)]*\)/g, "")
+      .replace(/\[[^\]]*\]/g, "")
+      .replace(/[()]/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+
+    const sentences = cleanReplyForTTS
+      .match(/[^.!?]+[.!?]+|[^.!?]+$/g)
+      ?.map(s => s.trim())
+      .filter(s => s.length > 1 && s !== ")" && s !== "(") || [];
+
+    clearGeneratedAudio();
+
+  const segments = [];
+
+  const gestureList = sentences.map((_, i) =>
+    aiGestureList[i % aiGestureList.length] || {
+      gesture: "talk_pose",
+      emotion: "neutral",
+      intensity: "low"
+    }
+  );
+
+  for (let i = 0; i < sentences.length; i++) {
+    const safeSentence = sentences[i]
+      .replace(/\([^)]*\)/g, "")
+      .replace(/[()]/g, "")
       .replace(/com\/\S+\/[a-zA-Z-]+/g, "")
       .replace(/[^\x00-\x7F]+/g, "")
       .replace(/["']/g, "")
       .trim();
 
-    const tts = spawnSync("py", ["-3.10", "text_to_speech.py", safeReply, audioFullPath], { encoding: "utf-8" });
+    if (!safeSentence) continue;
+
+    const segmentNumber = String(i + 1).padStart(2, "0");
+    const segmentFilename = `reply_${segmentNumber}.wav`;
+    //const segmentFilename = `reply_${Date.now()}_${i}.wav`;
+    const segmentFullPath = `${audioDir}/${segmentFilename}`;
+
+    /* hier befindet sich das alte TTS 
+    
+    const tts = spawnSync("py", ["-3.10", "text_to_speech.py", safeSentence, segmentFullPath], {
+      encoding: "utf-8"
+    });
+
     if (tts.error || tts.status !== 0) {
       console.error("❌ TTS failed:", tts.stderr || tts.error?.message);
       res.write(JSON.stringify({ error: "TTS failed.", detail: tts.stderr || tts.error?.message }));
       return res.end();
     }
+    */
+  
 
+    /* der Piper Server läuft hier*/
+    try {
+      await synthesizeWithPiperServer(safeSentence, segmentFullPath);
+    } catch (err) {
+      console.error("❌ Piper TTS failed:", err.message);
+      res.write(JSON.stringify({ error: "TTS failed.", detail: err.message }));
+      return res.end();
+    }
+
+    const gestureData = gestureList[i] || {
+      gesture: "talk_pose",
+      emotion: "neutral",
+      intensity: "low"
+    };
+
+    segments.push({
+      index: i,
+      text: safeSentence,
+      wav_path: segmentFullPath.replace(/\\/g, "/"),
+      gesture: gestureData.gesture,
+      emotion: gestureData.emotion,
+      intensity: gestureData.intensity
+    });
+  }
+    
     // payload back to caller
     const finalPayload = {
       transcript,
       response: aiReply,
-      audio_url: `http://localhost:3003/audio/${audioFilename}`
+      segments
     };
 
     console.log("✅ Sending response to Unreal:", finalPayload);
