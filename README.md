@@ -293,6 +293,9 @@ Beispiel:
 }
 ```
 
+> [!IMPORTANT]
+> Auch das zweite Terminal mit dem SSH-Tunnel muss während der Verwendung des Systems geöffnet bleiben. Wird eines der beiden Terminals geschlossen, kann das Backend das Sprachmodell nicht mehr erreichen.
+
 ### Wichtige Informationen:
 
 - Beim erstmaligen Laden des 70B-Modells kann eine Wartezeit von etwa fünf bis zehn Minuten auftreten. Dauert der Vorgang länger als zehn Minuten, kann er mit `Strg+C` abgebrochen und erneut gestartet werden.
