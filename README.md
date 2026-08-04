@@ -223,7 +223,9 @@ Anschließend Ollama mit den für die verwendeten Modelle vorgesehenen Laufzeitp
 
 ```bash
 module load cs/ollama
+```
 
+```
 OLLAMA_HOST=0.0.0.0:11434 \
 OLLAMA_LOAD_TIMEOUT=0 \
 OLLAMA_CONTEXT_LENGTH=4096 \
