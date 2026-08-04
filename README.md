@@ -42,7 +42,7 @@ cd Bachelorarbeit
 ```
 **Anschließend das Backend-Repository im Terminal klonen:**
 ```
-...\Bachelorarbeit>git clone https://github.com/kayafat/Backend_Bachelor.git
+git clone https://github.com/kayafat/Backend_Bachelor.git
 ```
 
 ## 2. Dateipfade anpassen und .env Datei erstellen
