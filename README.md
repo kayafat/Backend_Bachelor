@@ -13,7 +13,7 @@ erzeugt wissensbasierte Antworten mit LangChain, FAISS und Ollama und stellt
 die segmentierten Antworten einschließlich der erzeugten WAV-Dateien für das
 Unreal-Engine-Frontend bereit.
 
-Für den vollständigen Betrieb werden zusätzlich das [Unreal-Engine-Frontend](https://github.com/kayafat/Bachelor_Frontend.git), eine PostgreSQL-Datenbank über Docker und ein Sprachmodell auf dem DACHS-Cluster der Hochschule Esslingen benötigt.
+Für den vollständigen Betrieb werden zusätzlich das [Unreal-Engine-Frontend](https://github.com/kayafat/Frontend_Bachelor.git), eine PostgreSQL-Datenbank über Docker und ein Sprachmodell auf dem DACHS-Cluster der Hochschule Esslingen benötigt.
 
 # Schritt 1: Installation des Backends
 
@@ -312,7 +312,7 @@ Wenn alles erfolgreich läuft, kann man...
 - ... Docker Desktop den Container `backend_bachelor` starten,
 - ... DACHS mit den jeweiligen Terminals erfolgreich bedienen.
 
-Als nächstes muss man das Frontend starten: Das GitHub zum Frontend befindet sich [hier](https://github.com/kayafat/Bachelor_Frontend.git).
+Als nächstes muss man das Frontend starten: Das GitHub zum Frontend befindet sich [hier](https://github.com/kayafat/Frontend_Bachelor.git).
 
 ### Autor
 - **Fatih Kaya**
