@@ -451,6 +451,16 @@ RESTART IDENTITY CASCADE;
 
 ---
 
+## Installationsguide mit Video
+
+Unter folgendem [Video-Link](https://www.youtube.com/watch?v=O99oO8TqKOY) ist eine grobe Installation des Systems verfügbar.
+- Hier wird Backend + Frontend zusammen installiert.
+- Auch eine Ausführung des Systems wird grob gezeigt.
+
+<img width="1860" height="1049" alt="chrome_maGY9iV2R5" src="https://github.com/user-attachments/assets/de716ae6-f122-48e3-93f6-388ec2bdaa9a" />
+
+---
+
 # Problembehebung im Backend
 
 ### Python-Abhängigkeiten können nicht installiert werden (backend_requirements.txt)
