@@ -15,6 +15,8 @@ Unreal-Engine-Frontend bereit.
 
 Für den vollständigen Betrieb werden zusätzlich das [Unreal-Engine-Frontend](https://github.com/kayafat/Frontend_Bachelor.git), eine PostgreSQL-Datenbank über Docker und ein Sprachmodell auf dem DACHS-Cluster der Hochschule Esslingen benötigt.
 
+---
+
 # Schritt 1: Installation des Backends
 
 Hier wird zunächst nur das Backend-Setup beschrieben. Eine ausführliche Erklärung für das DACHS befindet sich weiter unten.
@@ -33,6 +35,8 @@ Vor der erstmaligen Einrichtung werden folgende Komponenten benötigt:
 > [!NOTE]
 > Die in dieser Anleitung verwendete Angabe wie `D:` dient als Beispiel. Laufwerk und Verzeichnisse, müssen jeweils in der Entwicklungsumgebung angepasst werden.
 
+---
+
 ## 1. Arbeitsordner anlegen und Backend herunterladen
 
 Öffnen Sie ein Terminal und erstellen Sie mit folgenden Befehlen einen Ordner, oder im Explorer auf dem gewünschten Laufwerk.
@@ -45,22 +49,31 @@ cd Bachelorarbeit
 git clone https://github.com/kayafat/Backend_Bachelor.git
 ```
 
+---
+
 ## 2. Dateipfade anpassen und .env Datei erstellen
 
 Öffnen Sie den Backend-Ordner in einer Entwicklungsumgebung und erstellen Sie eine neue `.env`-Datei und kopieren Sie die Inhalte von der `.env.example`.
 
-**Verzeichnisse in server2.mjs und piper_server.py anpassen.**
+<img width="397" height="97" alt="Code_C87pgeCqeP" src="https://github.com/user-attachments/assets/3ebf5747-19df-4611-b362-021dbe6fb914" />
+
+### **Verzeichnisse in server2.mjs und piper_server.py anpassen.**
 
 **server2.mjs**:
 ```
 const audioDir = "D:/Bachelorarbeit/Backend_Bachelor/generated";
 const audioDir = "<LAUFWERK>:/<ORDNER>/Backend_Bachelor/generated";
 ```
+
+>[!NOTE]
+>Es gibt zwei `audioDir` im `server2.mjs`!
+
 **piper_server.py**:
 ```
 BASE_DIR = r"D:\Bachelorarbeit\Backend_Bachelor"
 BASE_DIR = r"<LAUFWERK>:\<ORDNER>\Backend_Bachelor"
 ```
+---
 
 ## 3. Python- und Node.js-Abhängigkeiten installieren
 
@@ -70,11 +83,17 @@ Python-Abhängigkeiten installieren:
 ```bat
 py -3.10 -m pip install -r backend_requirements.txt
 ```
+
+>[!IMPORTANT]
+>Fehlermeldungen bei der Installation von `backend_requirements.txt` werden im letzten Abschnitt **Problembehandlung** der README behandelt.
+
 Node.js-Abhängigkeiten installieren:
 ```bat
 npm install
 ```
 Falls vulnerabilities auftreten sollten, mit dem folgenden Befehl beheben: `npm audit fix`.
+
+---
 
 ## 4. Docker und PostgreSQL vorbereiten
 
@@ -84,7 +103,11 @@ Docker Desktop starten. Im Terminal im Backend-Verzeichnis folgendes eingeben:
 docker compose up -d
 ```
 
-Der verwendete Container trägt in der Entwicklungsumgebung die Bezeichnung: `backend_bachelor`.
+- **Der verwendete Container trägt in der Entwicklungsumgebung die Bezeichnung: `backend_bachelor`.**
+
+<img width="995" height="291" alt="Docker_Desktop_O6OUQs95L4" src="https://github.com/user-attachments/assets/f155451c-d248-4975-b72a-8aecce63b5ca" />
+
+---
 
 ## 5. Piper-Server starten
 
@@ -132,10 +155,7 @@ Server running at http://localhost:3003
 
 Das Terminal muss während der Verwendung des Systems geöffnet bleiben.
 
-### Problembehebung im Backend
-
-- Falls Docker keine Virtualisation aufzeigt, öffnen Sie PowerShell als Administrator und führen `wsl --install --no-distribution` aus.
-- Falls bei `npm start` die connection refused ist, überprüfen Sie ob der Container `backend_bachelor` gestartet wurde.
+---
 
 # Schritt 2: DACHS vorbereiten und starten
 
@@ -148,6 +168,8 @@ Das Terminal muss während der Verwendung des Systems geöffnet bleiben.
 > Die Angaben `es_fakait01` und `gpu136` dienen als Beispiele. Der
 > Benutzername und der GPU-Hostname müssen an den persönlichen Zugang und die
 > aktuelle GPU-Zuweisung angepasst werden.
+
+---
 
 ## 1. Erstes PowerShell-Terminal: GPU-Knoten und Ollama-Server:
 
@@ -182,6 +204,8 @@ ollama serve
 > [!Important]
 > Dieses Terminal bleibt geöffnet, solange das Sprachmodell benötigt wird.
 
+---
+
 ## 2. Zweites PowerShell-Terminal: SSH-Tunnel und Modelle
 
 **Login mit der gpu136:**
@@ -202,6 +226,8 @@ ollama pull llama3.1:70b
 ```
 - Installierte Modelle kann man mit `ollama list` anzeigen.
 
+---
+
 ## 3. Sprachmodell in `langchain_query.py` auswählen
 
 In `langchain_query.py` wird festgelegt, welches Ollama-Modell verwendet wird.
@@ -213,6 +239,8 @@ Beispiel für das 8B- und 70B-Modell:
 > [!Important]
 > Nur die gewünschte Konfiguration darf aktiv sein. Andere Modellkonfigurationen bleiben auskommentiert. Nach der Anpassung wird die Datei gespeichert.
 > Die lokale Adresse `http://localhost:11434` verweist über den SSH-Tunnel auf den Ollama-Server des zugewiesenen GPU-Knotens.
+
+---
 
 ## 4. Ollama-Server mit Laufzeitparametern starten (Erstes Terminal)
 
@@ -245,6 +273,8 @@ ollama serve 2>&1 | tee ~/ollama-server.log
 > [!Important]
 > Das erste Terminal muss während der Verwendung des Systems geöffnet bleiben.
 
+---
+
 ## 5. Sprachmodell erstmalig laden (Zweites Terminal)
 
 Im zweiten PowerShell-Terminal kann das gewählte Modell durch eine kurze Testanfrage geladen werden.
@@ -266,6 +296,8 @@ curl http://gpu136:11434/api/generate \
 
 - Für das 8B-Modell wird lediglich der Modellname geändert: `"model": "llama3.1:8b"`
 - `gpu136` muss durch den aktuell zugewiesenen GPU-Host ersetzt werden.
+
+---
 
 ## 6. Ladezustand prüfen (Zweites Terminal)
 
@@ -303,6 +335,7 @@ Beispiel:
 - Beim erstmaligen Laden des 70B-Modells kann eine Wartezeit von etwa fünf bis zehn Minuten auftreten. Dauert der Vorgang länger als zehn Minuten, kann er mit `Strg+C` abgebrochen und erneut gestartet werden.
 - Durch `"keep_alive": "60m"` bleibt das Modell nach der Anfrage für 60 Minuten im Speicher. Die Dauer kann an die vorgesehene Test- oder Nutzungszeit angepasst werden.
 
+---
 
 # Schritt 3: Backend + DACHS Cluster
 
@@ -314,6 +347,111 @@ Wenn alles erfolgreich läuft, kann man...
 
 Als nächstes muss man das Frontend starten: Das GitHub zum Frontend befindet sich [hier](https://github.com/kayafat/Frontend_Bachelor.git).
 
-### Autor
-- **Fatih Kaya**
-- Bachelorarbeit, Hochschule Esslingen
+---
+
+# Problembehebung im Backend
+
+### Python-Abhängigkeiten können nicht installiert werden (backend_requirements.txt)
+
+> [!NOTE]
+> Falls bei der Installation von `openai-whisper` die Fehlermeldung
+> `No module named 'pkg_resources'` auftritt, wird Whisper vor den übrigen
+> Abhängigkeiten mit einer kompatiblen Setuptools-Version installiert:
+
+- Notice: Neue Version verfügbar:
+```bat
+py -3.10 -m pip install --upgrade pip
+```
+
+- Manuelles installieren von `openai-whisper==20240930`
+```bat
+py -3.10 -m pip install --force-reinstall "setuptools<82" wheel
+py -3.10 -m pip install --no-build-isolation openai-whisper==20240930
+```
+
+- Anschließend kann man die restlichen Voraussetzungen aus `backend_requirements.txt` downloaden:
+```bat
+py -3.10 -m pip install -r backend_requirements.txt
+```
+---
+
+### Docker Desktop zeigt keine Virtualisation an
+- Öffnen Sie PowerShell als Administrator und führen `wsl --install --no-distribution` aus.
+
+---
+
+### Piper-Server startet nicht
+
+<img width="1939" height="526" alt="mspaint_m3OcvEwD5m" src="https://github.com/user-attachments/assets/89ca8342-34f2-432c-ac15-f511944d42f2" />
+
+- Windows benötigt ONNX Runtime die aktuelle Microsoft Visual C++ Runtime.
+
+**Möglichkeit 1: Visual-C++-Runtime manuell installieren**
+
+Falls Piper beziehungsweise ONNX Runtime mit einem DLL-Fehler nicht gestartet
+werden kann, muss möglicherweise das Microsoft Visual C++ Redistributable
+nachinstalliert werden.
+
+1. Die Seite
+   [Visual Studio Older Downloads](https://visualstudio.microsoft.com/vs/older-downloads/)
+   öffnen.
+2. Nach `Visual Studio 2022` beziehungsweise `Visual C++ Redistributable` suchen.
+
+<img width="1781" height="466" alt="chrome_DQC9NqJ4w5" src="https://github.com/user-attachments/assets/039ef463-72c5-446b-a622-1726ffdda436" />
+
+3. Folgende Auswahl treffen:
+   - **Produkt:** Visual C++ Redistributable for Visual Studio 2022
+   - **Version:** 17.14
+   - **Architektur:** x64
+   - **Dateityp:** exe
+4. Die Installationsdatei herunterladen und ausführen.
+5. Falls die Runtime bereits installiert ist, im Installationsprogramm
+   **Reparieren** auswählen.
+6. Windows anschließend neu starten.
+
+**Möglichkeit 2: über PowerShell Terminal** 
+```
+winget install --id Microsoft.VCRedist.2015+.x64 --exact
+```
+>Falls bereits installiert: Installationsroutine Reparieren beziehungsweise das Paket aktuallisieren.
+
+> [!NOTE]
+> Die installierte Runtime wird in Windows als
+> `Microsoft Visual C++ 2015–2022 Redistributable (x64)` angezeigt.
+> Die zu Visual Studio 2022 Version 17.14 gehörende Runtime besitzt die
+> Versionsreihe `14.44`. In der getesteten Umgebung wurde
+> `14.44.35211.0` verwendet.
+
+---
+
+---
+
+### Bei `npm start` wurde die Verbindung zur Datenbank abgelehnt → *connection refused*
+
+<img width="493" height="418" alt="Code_s4oTF6lMNV" src="https://github.com/user-attachments/assets/4ac41d15-3c52-495a-aab5-4ff8d96e6493" />
+
+- Überprüfen Sie ob der Container `backend_bachelor` gestartet wurde. Siehe Bild:
+
+<img width="488" height="140" alt="Docker_Desktop_IqU6Anro88" src="https://github.com/user-attachments/assets/82e35ffd-4630-499a-8909-8edb5f576ebc" />
+
+---
+
+
+### Es werden keine Audio-Files erstellt
+
+- Stellen Sie sicher dass der Piper-Server mit folgendem Befehl: `py -3.10 piper_server.py` gestartet wurde.
+
+---
+
+### AI-HTTP Request failed
+
+- Überprüfen Sie folgendes:
+  - DACHS-Verbindung und zugewiesener GPU-Knoten
+  - Docker mit dem Container `backend_bachelor` läuft
+  - Backend gestartet mit `npm start` und den Piper-Server
+  - Das richtige Sprachmodell ist in der GPU im DACHS geladen
+  - in `langchain_query.py` ist das richtige Modell auskommentiert 
+
+>### Autor
+>- **Fatih Kaya**
+>- Bachelorarbeit, Hochschule Esslingen
