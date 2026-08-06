@@ -460,6 +460,8 @@ winget install --id Microsoft.VCRedist.2015+.x64 --exact
   - Das richtige Sprachmodell ist in der GPU im DACHS geladen
   - in `langchain_query.py` ist das richtige Modell auskommentiert 
 
+---
+
 >### Autor
 >- **Fatih Kaya**
 >- Bachelorarbeit, Hochschule Esslingen
