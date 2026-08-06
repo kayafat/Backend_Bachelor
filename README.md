@@ -124,7 +124,15 @@ Piper voice loaded.
 Piper server running at http://127.0.0.1:5005
 ```
 
-Dieses Terminal bleibt geöffnet. Der Piper-Server erzeugt die segmentweisen WAV-Dateien, die anschließend vom Unreal-Engine-Frontend verwendet werden.
+>[!NOTE]
+>Dieses Terminal bleibt geöffnet. Der Piper-Server erzeugt die segmentweisen WAV-Dateien, die anschließend vom Unreal-Engine-Frontend verwendet werden.
+
+Bei Interesse, kann man im Terminal unter `...\Bachelorarbeit\Backend_Bachelor>` folgenden Befehl ausführen, um eine `.wav` zu erzeugen und die Stimme von Amy zu hören:
+
+```
+echo "Hello my name is Amy. I am the voice model for the current MetaHuman in the Unreal Engine Learning Environment" | py -3.10 -m piper 
+--model ".\voices\en_US-amy-medium.onnx" --output_file ".\PiperVoice_Test.wav"
+```
 
 ---
 
