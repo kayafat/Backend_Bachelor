@@ -410,7 +410,7 @@ llm = Ollama(model="llama3.2:3b", base_url="http://127.0.0.1:11434")
 
 ## Datenbank leeren
 
-Wenn man die Konversationen Und Nachrichten löschen möchte, geht das alleine über die `history.txt` nicht. Dafür muss man folgende Schritte ausführen:
+Wenn man die Inhalte aus der Datenbank löschen möchte, geht das alleine über die `history.txt` nicht. Dafür muss man folgende Schritte ausführen:
 
 1. Docker Desktop den Container `backend_bachelor` starten.
 
