@@ -357,6 +357,100 @@ Als nächstes muss man das Frontend starten: Das GitHub zum Frontend befindet si
 
 ---
 
+# Extras
+
+## Lokales Backend (Ohne DACHS)
+
+>[!Important]
+>Wenn man das System nicht mit dem DACHS-Cluster starten kann, dann muss man folgende Änderungen vornehmen:
+
+1. [Ollama](https://ollama.com/download) lokal installieren.
+
+2. Nach der Installation im PowerShell: `ollama pull llama3.1:8b` oder `ollama pull llama3.2:3b`.
+
+3. Mit `ollama list` kann man die heruntergeladenen Modelle ansehen. Erwartete Ausgabe:
+```
+PS D:\llama_modelle> ollama list
+NAME           ID              SIZE      MODIFIED
+llama3.1:8b    46e0c10c039e    4.9 GB    5 minutes ago
+llama3.2:3b    a80c4f17acd5    2.0 GB    8 minutes ago
+```
+4. mit `ollama run llama3.1:8b` oder `ollama run llama3.2:3b` das Modell testen.
+5. Mit dem folgenden Befehl kann man die installierten Modelle abfragen:
+```
+curl.exe http://localhost:11434/api/tags
+```
+- Erwartete Ausgabe:
+```
+{"models":
+  [
+    {"name":"llama3.1:8b","model":"llama3.1:8b","modified_at":"2026-08-06T10:02:50.5922519+02:00","size":4920753328,"digest":"46e0c10c039e019119339687c3c1757cc81b9da49709a3b3924863ba87ca666e","details":
+    {"parent_model":"","format":"gguf","family":"llama","families":["llama"],"parameter_size":"8.0B","quantization_level":"Q4_K_M","context_length":131072,"embedding_length":4096},"capabilities":["completion","tools"]},
+    {"name":"llama3.2:3b","model":"llama3.2:3b","modified_at":"2026-08-06T09:44:52.3915262+02:00","size":2019393189,"digest":"a80c4f17acd55265feec403c7aef86be0c25983ab279d83f3bcd3abbcb5b8b72","details":
+    {"parent_model":"","format":"gguf","family":"llama","families":["llama"],"parameter_size":"3.2B","quantization_level":"Q4_K_M","context_length":131072,"embedding_length":3072},"capabilities":["completion","tools"]}
+  ]
+}
+```
+6. In `langchain_query.py` die base_url von `llm = Ollama(model="llama3.1:70b", base_url="http://localhost:11434")` ändern zu:
+```
+llm = Ollama(model="llama3.1:8b", base_url="http://127.0.0.1:11434")
+llm = Ollama(model="llama3.2:3b", base_url="http://127.0.0.1:11434")
+```
+- Auch weiter unten in der `langchain_query.py` in der Exception das richtige Modell auskommentieren.
+
+### Danach kann man das Backend wie gewohnt starten.
+- Docker Desktop starten.
+```
+...\Bachelorarbeit\Backend_Bachelor> npm start
+...\Bachelorarbeit\Backend_Bachelor> py -3.10 piper_server.py
+```
+- In **Unreal Engine** auf den Play-Button drücken.
+- Mit **[Z]** mit dem MetaHuman Dozenten sprechen.    
+---
+
+## Datenbank leeren
+
+Wenn man die Konversationen Und Nachrichten löschen möchte, geht das alleine über die `history.txt` nicht. Dafür muss man folgende Schritte ausführen:
+
+1. Docker Desktop den Container `backend_bachelor` starten.
+
+<img width="986" height="287" alt="Docker_Desktop_madhhSyiwU" src="https://github.com/user-attachments/assets/0de7bb04-3b06-4ca8-82b6-b262cf4b2dfb" />
+   
+2. PowerShell Terminal öffnen
+3. Folgende Befehle eingeben:
+```
+docker exec -it smart-pg psql -U postgres
+```
+
+- Danach verbindet man sich mit der Datenbank
+
+```
+\c smartdb
+```
+
+- Und anschließend kann man mit `\dt` die Inhalte der Datenbank anzeigen lassen.
+
+- Beispielsweise mit `SELECT * FROM messages;` oder `SELECT * FROM memory;` erhält man die jeweiligen Daten.
+
+<img width="1600" height="639" alt="powershell_2ZCinJ3ts1" src="https://github.com/user-attachments/assets/18ef4d40-5d4c-463c-b72f-7b4949187478" />
+
+4. Löschen der Inhalte aus der Datenbank mit folgendem Befehl:
+```
+TRUNCATE TABLE
+    public.messages,
+    public.conversations,
+    public.memory,
+    public.files
+RESTART IDENTITY CASCADE;
+```
+- Anschließend mit `SELECT * FROM messages;` oder `SELECT * FROM memory;` überprüfen.
+
+### Ergebnis:
+
+<img width="1237" height="758" alt="powershell_l9dVsP4nXw" src="https://github.com/user-attachments/assets/87121380-58d2-4cbd-a2e6-8c211e1a94f2" />
+
+---
+
 # Problembehebung im Backend
 
 ### Python-Abhängigkeiten können nicht installiert werden (backend_requirements.txt)
@@ -364,7 +458,8 @@ Als nächstes muss man das Frontend starten: Das GitHub zum Frontend befindet si
 > [!NOTE]
 > Falls bei der Installation von `openai-whisper` die Fehlermeldung
 > `No module named 'pkg_resources'` auftritt, wird Whisper vor den übrigen
-> Abhängigkeiten mit einer kompatiblen Setuptools-Version installiert:
+> Abhängigkeiten mit einer kompatiblen Setuptools-Version installiert:![Uploading Docker_Desktop_madhhSyiwU.png…]()
+
 
 - Notice: Neue Version verfügbar:
 ```bat
@@ -443,7 +538,6 @@ winget install --id Microsoft.VCRedist.2015+.x64 --exact
 <img width="488" height="140" alt="Docker_Desktop_IqU6Anro88" src="https://github.com/user-attachments/assets/82e35ffd-4630-499a-8909-8edb5f576ebc" />
 
 ---
-
 
 ### Es werden keine Audio-Files erstellt
 
