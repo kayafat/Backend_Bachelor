@@ -477,7 +477,7 @@ Unter folgendem [Video-Link](https://www.youtube.com/watch?v=O99oO8TqKOY) ist ei
 > [!NOTE]
 > Falls bei der Installation von `openai-whisper` die Fehlermeldung
 > `No module named 'pkg_resources'` auftritt, wird Whisper vor den übrigen
-> Abhängigkeiten mit einer kompatiblen Setuptools-Version installiert:![Uploading Docker_Desktop_madhhSyiwU.png…]()
+> Abhängigkeiten mit einer kompatiblen Setuptools-Version installiert:
 
 
 - Notice: Neue Version verfügbar:
