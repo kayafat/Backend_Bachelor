@@ -366,17 +366,21 @@ Als nächstes muss man das Frontend starten: Das GitHub zum Frontend befindet si
 
 1. [Ollama](https://ollama.com/download) lokal installieren.
 
-2. Nach der Installation im PowerShell: `ollama pull llama3.1:8b` oder `ollama pull llama3.2:3b`.
+2. In Ollama den Speicherort für die Modelle anpassen:
 
-3. Mit `ollama list` kann man die heruntergeladenen Modelle ansehen. Erwartete Ausgabe:
+<img width="586" height="450" alt="ollama_app_1r4gNN4A0E" src="https://github.com/user-attachments/assets/a814f78f-544d-4191-ac75-b2a1425d5fcd" />
+
+3. Nach der Installation im PowerShell: `ollama pull llama3.1:8b` oder `ollama pull llama3.2:3b`.
+
+4. Mit `ollama list` kann man die heruntergeladenen Modelle ansehen. Erwartete Ausgabe:
 ```
 PS D:\llama_modelle> ollama list
 NAME           ID              SIZE      MODIFIED
 llama3.1:8b    46e0c10c039e    4.9 GB    5 minutes ago
 llama3.2:3b    a80c4f17acd5    2.0 GB    8 minutes ago
 ```
-4. mit `ollama run llama3.1:8b` oder `ollama run llama3.2:3b` das Modell testen.
-5. Mit dem folgenden Befehl kann man die installierten Modelle abfragen:
+5. mit `ollama run llama3.1:8b` oder `ollama run llama3.2:3b` das Modell testen.
+6. Mit dem folgenden Befehl kann man die installierten Modelle abfragen:
 ```
 curl.exe http://localhost:11434/api/tags
 ```
@@ -391,7 +395,7 @@ curl.exe http://localhost:11434/api/tags
   ]
 }
 ```
-6. In `langchain_query.py` die base_url von `llm = Ollama(model="llama3.1:70b", base_url="http://localhost:11434")` ändern zu:
+7. In `langchain_query.py` die base_url von `llm = Ollama(model="llama3.1:70b", base_url="http://localhost:11434")` ändern zu:
 ```
 llm = Ollama(model="llama3.1:8b", base_url="http://127.0.0.1:11434")
 llm = Ollama(model="llama3.2:3b", base_url="http://127.0.0.1:11434")
