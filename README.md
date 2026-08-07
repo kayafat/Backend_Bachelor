@@ -402,14 +402,14 @@ llm = Ollama(model="llama3.2:3b", base_url="http://127.0.0.1:11434")
 ```
 - Auch weiter unten in der `langchain_query.py` in der Exception das richtige Modell auskommentieren.
 
-### Danach kann man das Backend wie gewohnt starten.
+### Danach kann man das Backend wie gewohnt starten
 - Docker Desktop starten.
 ```
 ...\Bachelorarbeit\Backend_Bachelor> npm start
 ...\Bachelorarbeit\Backend_Bachelor> py -3.10 piper_server.py
 ```
 - In **Unreal Engine** auf den Play-Button drücken.
-- Mit **[Z]** mit dem MetaHuman Dozenten sprechen.    
+- Anschließend über die **[Z]**-Taste mit dem MetaHuman Dozenten sprechen.    
 ---
 
 ## Datenbank leeren
