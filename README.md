@@ -32,6 +32,11 @@ Vor der erstmaligen Einrichtung werden folgende Komponenten benötigt:
 - Docker beziehungsweise [Docker Desktop](https://docs.docker.com/desktop/setup/install/windows-install/)
 - eine Entwicklungsumgebung, beispielsweise Visual Studio Code
 
+### Folgende Versionen wurden benutzt:
+
+<img width="460" height="223" alt="powershell_oTiKW2sE5j" src="https://github.com/user-attachments/assets/f7477646-4f40-4b3f-8d39-83837000e4b9" />
+
+
 > [!NOTE]
 > Die in dieser Anleitung verwendete Angabe wie `D:` dient als Beispiel. Laufwerk und Verzeichnisse, müssen jeweils in der Entwicklungsumgebung angepasst werden.
 
