@@ -64,20 +64,33 @@ git clone https://github.com/kayafat/Backend_Bachelor.git
 
 ### **Verzeichnisse in server2.mjs und piper_server.py anpassen.**
 
-**server2.mjs**:
+**server2.mjs** *(Zeile 34, 327 und 341)*:
 ```
 const audioDir = "D:/Bachelorarbeit/Backend_Bachelor/generated";
 const audioDir = "<LAUFWERK>:/<ORDNER>/Backend_Bachelor/generated";
+
+const audioPath = "D:/Bachelorarbeit/Backend_Bachelor/voice_recording/voice.wav";
+const audioPath = "<LAUFWERK>:/<ORDNER>/Backend_Bachelor/voice_recording/voice.wav";
 ```
 
 >[!NOTE]
 >Es gibt zwei `audioDir` im `server2.mjs`!
 
-**piper_server.py**:
+**piper_server.py** *(Zeile 8)*:
 ```
 BASE_DIR = r"D:\Bachelorarbeit\Backend_Bachelor"
 BASE_DIR = r"<LAUFWERK>:\<ORDNER>\Backend_Bachelor"
 ```
+
+**record_audio.py** *(Zeile 10)*:
+```
+output_path = r"D:\Bachelorarbeit\Backend_Bachelor\voice_recording\voice.wav"
+output_path = r"<LAUFWERK>:\<ORDNER>\Backend_Bachelor\voice_recording\voice.wav"
+```
+
+>[!Important]
+>Man muss insgesamt **5 Pfade** anpassen. **3 Pfade** in `server2.mjs`, und jeweils **1 Pfad** in `piper_server.py` und `record_audio.py`.
+
 ---
 
 ## 3. Python- und Node.js-Abhängigkeiten installieren
@@ -462,7 +475,7 @@ RESTART IDENTITY CASCADE;
 
 ## Installationsguide mit Video
 
-Unter folgendem [Video-Link](https://www.youtube.com/watch?v=O99oO8TqKOY) ist eine grobe Installation des Systems verfügbar.
+Unter folgendem [Video-Link](https://www.youtube.com/watch?v=IC43GnQUxRs) ist eine grobe Installation des Systems verfügbar.
 - Hier wird Backend + Frontend zusammen installiert.
 - Auch eine Ausführung des Systems wird grob gezeigt.
 
@@ -571,7 +584,41 @@ winget install --id Microsoft.VCRedist.2015+.x64 --exact
   - Docker mit dem Container `backend_bachelor` läuft
   - Backend gestartet mit `npm start` und den Piper-Server
   - Das richtige Sprachmodell ist in der GPU im DACHS geladen
-  - in `langchain_query.py` ist das richtige Modell auskommentiert 
+  - in `langchain_query.py` ist das richtige Modell auskommentiert
+ 
+---
+
+### Whisper kann Audiodatei nicht verarbeiten / FFmpeg fehlt
+
+Falls Whisper die aufgenommene WAV-Datei nicht verarbeiten kann und eine Fehlermeldung bezüglich `ffmpeg` beziehungsweise `FileNotFoundError` erscheint, muss FFmpeg installiert werden.
+
+1. Installation über PowerShell:
+
+```bat
+winget install --id Gyan.FFmpeg --exact --source winget
+```
+
+2. Ein neues PowerShell-Terminal öffnen und überprüfen, ob FFmpeg verfügbar ist:
+
+```bat
+ffmpeg -version
+```
+
+>[!NOTE]
+>Falls der Befehl nicht gefunden wird, muss das `bin`-Verzeichnis der FFmpeg-Installation zur Windows-Umgebungsvariable `PATH` hinzugefügt werden.
+
+---
+
+### Python-Modul wurde nicht gefunden
+
+Falls beim Start des Backends eine Fehlermeldung wie `ModuleNotFoundError: No module named 'sounddevice'` oder `ModuleNotFoundError: No module named 'langchain_huggingface'` auftritt, kann das fehlende Modul mit Python 3.10 nachinstalliert werden:
+
+```bat
+py -3.10 -m pip install sounddevice scipy
+py -3.10 -m pip install langchain-huggingface
+```
+
+- Anschließend das Backend erneut starten.
 
 ---
 
