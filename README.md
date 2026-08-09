@@ -559,8 +559,6 @@ winget install --id Microsoft.VCRedist.2015+.x64 --exact
 
 ---
 
----
-
 ### Bei `npm start` wurde die Verbindung zur Datenbank abgelehnt → *connection refused*
 
 <img width="493" height="418" alt="Code_s4oTF6lMNV" src="https://github.com/user-attachments/assets/4ac41d15-3c52-495a-aab5-4ff8d96e6493" />
