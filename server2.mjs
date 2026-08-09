@@ -338,7 +338,7 @@ app.post("/api/record-and-process", async (req, res) => {
     console.log("🎙️ Recording completed");
 
     //const audioPath = "C:/Users/mehme/Documents/Unreal Projects/Bachelor/Test/voice.wav";
-    const audioPath = "D:/Bachelorarbeit/Neu/Unreal_Engine_Bachelor/Test/voice.wav";
+    const audioPath = "D:/Bachelorarbeit/Backend_Bachelor/voice_recording/voice.wav";
 
     // 2) transcribe with Whisper
     const whisper = spawnSync("py", ["-3.10", "whisper_stt.py", audioPath], { encoding: "utf-8" });

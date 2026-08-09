@@ -7,7 +7,7 @@ DURATION = 5          # seconds to record
 
 # where to save the WAV (ensure folder exists)
 #output_path = r"C:\Users\mehme\Documents\Unreal Projects\Bachelor\Test\voice.wav" # an mein Ordner anpassen
-output_path = r"D:\Bachelorarbeit\Neu\Unreal_Engine_Bachelor\Test\voice.wav"
+output_path = r"D:\Bachelorarbeit\Backend_Bachelor\voice_recording\voice.wav"
 os.makedirs(os.path.dirname(output_path), exist_ok=True)
 
 try:
