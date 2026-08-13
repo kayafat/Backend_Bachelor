@@ -483,6 +483,14 @@ Unter folgendem [Video-Link](https://www.youtube.com/watch?v=IC43GnQUxRs) ist ei
 
 ---
 
+## Video des MetaHumans in Aktion
+
+Das folgende Video zeigt ein vollständiges Beispielgespräch mit dem MetaHuman-Dozenten und veranschaulicht dabei das Zusammenspiel zwischen Spracheingabe, Backend-Verarbeitung, Sprachausgabe, Lippenbewegungen und Gestensteuerung.
+
+🎥 **Video:** [Gespräch mit dem MetaHuman-Dozenten](https://www.youtube.com/watch?v=uJX-hlUqTNY)
+
+---
+
 # Problembehebung im Backend
 
 ### Python-Abhängigkeiten können nicht installiert werden (backend_requirements.txt)
